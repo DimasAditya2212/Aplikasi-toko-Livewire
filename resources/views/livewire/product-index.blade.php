@@ -1,4 +1,5 @@
 <div>
+
     <div class="row">
         <div class="col-md-8">
             <div class="table-responsive">
@@ -7,8 +8,6 @@
                 <div class="col-md-8">
                     <input type="text" placeholder="Scan Barang" class="form-control mb-4" wire:model="search" autofocus>
                 </div>
-
-
 
                 <!-- </div> -->
                 <table class="table table-striped table-sm bg-light">
@@ -98,4 +97,5 @@
         </div>
         {{ $products->links() }}
     </div>
+    >
 </div>

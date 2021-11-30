@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class DashboardProductController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,15 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return view('edit');
+        $title = 'stok';
+
+
+
+
+        return view('dashboard.product.index', [
+            "title" => "Total dari "  . $title,
+            "products" => Product::orderBy('total_stok', 'ASC')->latest()->filter(request(['search', 'kode_produk']))->paginate(15)->withQueryString()
+        ]);
     }
 
     /**
@@ -24,7 +33,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return view('dashboard.product.create');
     }
 
     /**
@@ -35,16 +44,28 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'kode_produk' => 'required|',
+            'nama_produk' => 'required|unique:products',
+            'harga_beli' => 'required',
+            'harga_jual' => 'required',
+            'total_stok' => 'required',
+        ]);
+
+
+        Product::create($validatedData);
+        return redirect('/productstambah')->with('success', 'post baru ditambah');
+
+        // return redirect('/posts')->with('success', 'post baru ditambah');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Product $product)
     {
         //
     }
@@ -58,8 +79,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         // dd($product);
-        return view('edit', [
-            'product' => $product
+        return view('dashboard.product.edit', [
+            'product' => $product,
+
         ]);
     }
 
@@ -67,7 +89,7 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Product $product)
@@ -88,18 +110,18 @@ class ProductController extends Controller
 
         Product::where('id', $product->id)
             ->update($validatedData);
-        return redirect('/products')->with('success', 'stock diubah');
+        return redirect('/productstambah')->with('success', 'stock diubah');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
     public function destroy(Product $product)
     {
         Product::destroy($product->id);
-        return redirect('/products')->with('success', 'sudah dihapus');
+        return redirect('/productstambah')->with('success', 'sudah dihapus');
     }
 }

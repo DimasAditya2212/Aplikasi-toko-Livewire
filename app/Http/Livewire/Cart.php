@@ -156,7 +156,7 @@ class Cart extends Component
         $cartTotal = \Cart::session(Auth()->id())->getTotal();
         $bayar = $this->uangPembeli;
         $kembalian = (int) $bayar - (int) $cartTotal;
-        // dd($kembalian);
+
 
         if ($kembalian >= 0) {
             DB::beginTransaction();
@@ -172,13 +172,14 @@ class Cart extends Component
 
                 foreach ($filterCart as $cart) {
                     $product = ProductModel::find($cart['id']);
-
+                    // dd($product);
                     if ($product->total_stok == 0) {
-                        session()->flash('error', 'ada error');
+                        session()->flash('error', 'Stock Habis');
+                    } else {
+                        $product->decrement('total_stok', $cart['quantity']);
                     }
-
-                    $product->decrement('total_stok', $cart['quantity']);
                 }
+                \Cart::clear();
 
                 DB::commit();
             } catch (\Throwable $th) {
